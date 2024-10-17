@@ -1,6 +1,6 @@
 export interface UserJson {
-  id: string,
-  username: string,
-  age: number,
-  hobbies: string[],
+  id: string;
+  username: string;
+  age: number;
+  hobbies: string[];
 }
