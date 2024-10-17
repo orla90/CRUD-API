@@ -10,7 +10,7 @@ import {
 import { ErrorType } from "./common/enum/error-types.enum";
 
 const users: User[] = [
-  { username: "olala", age: 10, hobbies: ["fl", "jk"], id: "1q" },
+  // { username: "olala", age: 10, hobbies: ["fl", "jk"], id: "1q" },
 ];
 
 export const isUuidValid = (id = "") => isUuid(id);

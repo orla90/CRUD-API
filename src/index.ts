@@ -16,7 +16,7 @@ import { ErrorType } from "./common/enum/error-types.enum";
 
 dotenv.config({ path: resolve(cwd(), ".env") });
 
-const server = http.createServer(
+export const server = http.createServer(
   (request: IncomingMessage, response: ServerResponse) => {
     try {
       const parsedUrl = url.parse(request.url || "", true);
