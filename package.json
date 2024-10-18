@@ -6,6 +6,7 @@
   "scripts": {
     "start:dev": "nodemon --exec ts-node src/index.ts",
     "start:prod": "npm run build && npm run start:build",
+    "start:multi": "nodemon --exec ts-node src/index.ts --multi",
     "build": "tsc",
     "start:build": "node dist/index.js",
     "test": "jest --runInBand --forceExit",
@@ -17,6 +18,7 @@
   "license": "ISC",
   "devDependencies": {
     "@types/jest": "^29.5.13",
+    "@types/node": "^22.7.6",
     "@types/supertest": "^6.0.2",
     "@types/uuid": "^10.0.0",
     "@typescript-eslint/eslint-plugin": "^8.9.0",

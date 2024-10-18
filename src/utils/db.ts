@@ -1,17 +1,15 @@
-import { BASE_URL, CONTENT_TYPE_JSON } from "./common/constants";
-import { User } from "./common/models/user";
+import { BASE_URL, CONTENT_TYPE_JSON } from "../common/constants";
+import { User } from "../common/models/user";
 import { v4 as uuidv4, validate as isUuid } from "uuid";
 import { IncomingMessage, ServerResponse } from "http";
 import { UrlWithParsedQuery } from "url";
 import {
   ErrorContentType,
   ResponseContentType,
-} from "./common/types/response-content-types";
-import { ErrorType } from "./common/enum/error-types.enum";
+} from "../common/types/response-content-types";
+import { ErrorType } from "../common/enum/error-types.enum";
 
-const users: User[] = [
-  // { username: "olala", age: 10, hobbies: ["fl", "jk"], id: "1q" },
-];
+const users: User[] = [];
 
 export const isUuidValid = (id = "") => isUuid(id);
 
