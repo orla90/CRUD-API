@@ -8,7 +8,7 @@
     "start:prod": "npm run build && npm run start:build",
     "build": "tsc",
     "start:build": "node dist/index.js",
-    "test": "jest",
+    "test": "jest --runInBand --forceExit",
     "lint": "eslint src --fix",
     "prettier": "prettier --write src/**/*.ts"
   },

@@ -3,7 +3,16 @@ import { server } from '../index';
 import { ErrorType } from '../common/enum/error-types.enum';
 import { BASE_URL } from '../common/constants';
 
-describe('User API', () => {
+describe('User API Test Scenario 1', () => {
+  afterAll(async () => {
+    await new Promise<void>((resolve, reject) => {
+      server.close((err?: Error) => {
+        if (err) return reject(err);
+        resolve();
+      });
+    });
+  });
+
   let userId: string;
 
   it('GET /api/users should return an empty array', async () => {
