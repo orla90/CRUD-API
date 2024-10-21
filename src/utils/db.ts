@@ -88,7 +88,7 @@ export const handlePostRequest = async (
     request.on("end", () => {
       try {
         const user = JSON.parse(requestBody);
-        if (user.username && user.age && user.hobbies) {
+        if (user && user.username && user.age && user.hobbies) {
           user.id = uuidv4();
           users.push(user);
           if (cluster.isWorker && process.send) {
@@ -110,8 +110,8 @@ export const handlePostRequest = async (
           });
         }
       } catch {
-        sendResponse(response, 500, CONTENT_TYPE_JSON, {
-          error: ErrorType.INTERNAL_SERVER_ERROR,
+        sendResponse(response, 400, CONTENT_TYPE_JSON, {
+          error: ErrorType.INVALID_JSON_BODY,
         });
       }
     });
@@ -135,42 +135,48 @@ export const handlePutRequest = async (
     });
 
     request.on("end", () => {
-      const user = JSON.parse(requestBody);
-      if (user.username && user.age && user.hobbies) {
-        const userId = parsedUrl.path?.split("/").pop();
-        const userIndex = users.findIndex((user) => user.id === userId);
+      try {
+        const user = JSON.parse(requestBody);
+        if (user.username && user.age && user.hobbies) {
+          const userId = parsedUrl.path?.split("/").pop();
+          const userIndex = users.findIndex((user) => user.id === userId);
 
-        if (userIndex !== -1 && isUuidValid(userId)) {
-          users[userIndex] = {
-            ...users[userIndex],
-            ...user,
-          };
-          if (cluster.isWorker && process.send) {
-            process.send({ type: "state", data: users });
+          if (userIndex !== -1 && isUuidValid(userId)) {
+            users[userIndex] = {
+              ...users[userIndex],
+              ...user,
+            };
+            if (cluster.isWorker && process.send) {
+              process.send({ type: "state", data: users });
+            }
+            sendResponse(response, 200, CONTENT_TYPE_JSON, users[userIndex]);
+            return;
           }
-          sendResponse(response, 200, CONTENT_TYPE_JSON, users[userIndex]);
-          return;
-        }
-        if (userIndex !== -1 && !isUuidValid(userId)) {
-          sendResponse(response, 400, CONTENT_TYPE_JSON, {
-            error: ErrorType.INVALID_USER_ID,
-          });
+          if (userIndex !== -1 && !isUuidValid(userId)) {
+            sendResponse(response, 400, CONTENT_TYPE_JSON, {
+              error: ErrorType.INVALID_USER_ID,
+            });
+          } else {
+            sendResponse(response, 404, CONTENT_TYPE_JSON, {
+              error: ErrorType.USER_NOT_FOUND,
+            });
+          }
         } else {
-          sendResponse(response, 404, CONTENT_TYPE_JSON, {
-            error: ErrorType.USER_NOT_FOUND,
+          const emptyFields = ["username", "age", "hobbies"].reduce(
+            (result: string[], prop: string) => {
+              if (!user[prop]) result.push(prop);
+              return result;
+            },
+            [],
+          );
+
+          sendResponse(response, 400, CONTENT_TYPE_JSON, {
+            error: `${ErrorType.MISSING_REQUIRED_FIELDS} ${emptyFields.join(", ")}`,
           });
         }
-      } else {
-        const emptyFields = ["username", "age", "hobbies"].reduce(
-          (result: string[], prop: string) => {
-            if (!user[prop]) result.push(prop);
-            return result;
-          },
-          [],
-        );
-
+      } catch {
         sendResponse(response, 400, CONTENT_TYPE_JSON, {
-          error: `${ErrorType.MISSING_REQUIRED_FIELDS} ${emptyFields.join(", ")}`,
+          error: ErrorType.INVALID_JSON_BODY,
         });
       }
     });
