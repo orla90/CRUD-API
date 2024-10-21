@@ -41,7 +41,7 @@ This application demonstrates simple CRUD API implemented using Node.js.
 - Use Node.js version 22.x.x (22.9.0 or higher). To run the application use one of the running modes commands.
 
 ### Running Modes
-- **Development Mode:** Use `npm run start:dev` to run the application with `nodemon` or `ts-node-dev`.
+- **Development Mode:** Use `npm run start:dev` to run the application with `nodemon`.
 - **Production Mode:** Use `npm run start:prod` to start the build process and run the bundled file.
 - **Horizontal Scaling Mode:** Use `npm run start:multi` to start multiple instances of application using the Node.js Cluster API .
 
