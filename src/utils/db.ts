@@ -8,7 +8,7 @@ import {
   ResponseContentType,
 } from "../common/types/response-content-types";
 import { ErrorType } from "../common/enum/error-types.enum";
-import cluster from 'cluster';
+import cluster from "cluster";
 
 let users: User[] = [];
 
@@ -31,7 +31,7 @@ export const handleGetRequest = (
 ) => {
   try {
     if (cluster.isWorker && process.send) {
-      process.send({ type: 'state', data: users });
+      process.send({ type: "state", data: users });
     }
 
     if (parsedUrl.path === BASE_URL) {
@@ -69,7 +69,7 @@ export const handleGetRequest = (
 
 export const getUserById = (userId: string) => {
   if (cluster.isWorker && process.send) {
-    process.send({ type: 'state', data: users });
+    process.send({ type: "state", data: users });
   }
   return users.find((user) => user.id === userId);
 };
@@ -92,7 +92,7 @@ export const handlePostRequest = async (
           user.id = uuidv4();
           users.push(user);
           if (cluster.isWorker && process.send) {
-            process.send({ type: 'state', data: users });
+            process.send({ type: "state", data: users });
           }
           sendResponse(response, 201, CONTENT_TYPE_JSON, user);
           return;
@@ -146,7 +146,7 @@ export const handlePutRequest = async (
             ...user,
           };
           if (cluster.isWorker && process.send) {
-            process.send({ type: 'state', data: users });
+            process.send({ type: "state", data: users });
           }
           sendResponse(response, 200, CONTENT_TYPE_JSON, users[userIndex]);
           return;
@@ -192,7 +192,7 @@ export const handleDeleteRequest = async (
 
     if (userIndex !== -1 && isUuidValid(userId)) {
       if (cluster.isWorker && process.send) {
-        process.send({ type: 'state', data: users });
+        process.send({ type: "state", data: users });
       }
       sendResponse(
         response,
@@ -220,7 +220,7 @@ export const handleDeleteRequest = async (
 export const updateUsers = (newUsers: User[]): void => {
   try {
     users = newUsers;
-  } catch (error) {
+  } catch {
     console.log(ErrorType.COMMON_ERROR);
   }
 };

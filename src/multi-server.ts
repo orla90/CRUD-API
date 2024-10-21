@@ -6,7 +6,7 @@ import { ClusterMessage, User } from "./common/models/user";
 import { ErrorType } from "./common/enum/error-types.enum";
 import { updateUsers } from "./utils/db";
 
-export const createMultiServer = (port: string | number) => {  
+export const createMultiServer = (port: string | number) => {
   try {
     const numberOfCPU = os.availableParallelism();
 
@@ -29,7 +29,7 @@ export const createMultiServer = (port: string | number) => {
       });
 
       cluster.on("exit", (worker) => {
-        console.log(`worker ${worker.process.pid} died`)
+        console.log(`worker ${worker.process.pid} died`);
       });
 
       const server = http.createServer();
@@ -47,7 +47,10 @@ export const createMultiServer = (port: string | number) => {
             port: MULTI_SERVER_PORT,
             path: pathname,
             method: originalReq.method,
-            headers: { ...originalReq.headers, host: `localhost:${MULTI_SERVER_PORT}` },
+            headers: {
+              ...originalReq.headers,
+              host: `localhost:${MULTI_SERVER_PORT}`,
+            },
           };
 
           const proxyRequest = http.request(requestOptions, (proxyResponse) => {
@@ -56,7 +59,7 @@ export const createMultiServer = (port: string | number) => {
               proxyResponse.headers,
             );
             proxyResponse.pipe(originalRes, { end: true });
-            console.log(`Request sent to port ${ MULTI_SERVER_PORT }`);
+            console.log(`Request sent to port ${MULTI_SERVER_PORT}`);
           });
 
           originalReq.pipe(proxyRequest, { end: true });
@@ -71,12 +74,12 @@ export const createMultiServer = (port: string | number) => {
       );
 
       server.listen(port, () =>
-        console.log(`Primary server listening on port ${ port }`),
+        console.log(`Primary server listening on port ${port}`),
       );
     } else {
       console.log(`Worker ${process.pid} started`);
 
-      process.on('message', (message: ClusterMessage) => {
+      process.on("message", (message: ClusterMessage) => {
         updateUsers(message.data);
       });
 
