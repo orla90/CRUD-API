@@ -13,3 +13,8 @@ export class User {
     this.hobbies = json.hobbies;
   }
 }
+
+export interface ClusterMessage {
+  type: string;
+  data: User[];
+}

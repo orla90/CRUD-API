@@ -6,4 +6,5 @@ export enum ErrorType {
   USER_ID_REQUIRED = "User ID is required",
   USER_NOT_FOUND = "User not found",
   INTERNAL_SERVER_ERROR = "Internal Server Error. Please try again later.",
+  COMMON_ERROR = "An error occurred. Please try again later."
 }

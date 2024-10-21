@@ -8,8 +8,9 @@ import {
   ResponseContentType,
 } from "../common/types/response-content-types";
 import { ErrorType } from "../common/enum/error-types.enum";
+import cluster from 'cluster';
 
-const users: User[] = [];
+let users: User[] = [];
 
 export const isUuidValid = (id = "") => isUuid(id);
 
@@ -29,6 +30,10 @@ export const handleGetRequest = (
   parsedUrl: UrlWithParsedQuery,
 ) => {
   try {
+    if (cluster.isWorker && process.send) {
+      process.send({ type: 'state', data: users });
+    }
+
     if (parsedUrl.path === BASE_URL) {
       sendResponse(response, 200, CONTENT_TYPE_JSON, users);
     } else if (parsedUrl.path?.startsWith(BASE_URL + "/")) {
@@ -63,6 +68,9 @@ export const handleGetRequest = (
 };
 
 export const getUserById = (userId: string) => {
+  if (cluster.isWorker && process.send) {
+    process.send({ type: 'state', data: users });
+  }
   return users.find((user) => user.id === userId);
 };
 
@@ -83,6 +91,9 @@ export const handlePostRequest = async (
         if (user.username && user.age && user.hobbies) {
           user.id = uuidv4();
           users.push(user);
+          if (cluster.isWorker && process.send) {
+            process.send({ type: 'state', data: users });
+          }
           sendResponse(response, 201, CONTENT_TYPE_JSON, user);
           return;
         } else {
@@ -125,7 +136,6 @@ export const handlePutRequest = async (
 
     request.on("end", () => {
       const user = JSON.parse(requestBody);
-
       if (user.username && user.age && user.hobbies) {
         const userId = parsedUrl.path?.split("/").pop();
         const userIndex = users.findIndex((user) => user.id === userId);
@@ -135,6 +145,9 @@ export const handlePutRequest = async (
             ...users[userIndex],
             ...user,
           };
+          if (cluster.isWorker && process.send) {
+            process.send({ type: 'state', data: users });
+          }
           sendResponse(response, 200, CONTENT_TYPE_JSON, users[userIndex]);
           return;
         }
@@ -178,6 +191,9 @@ export const handleDeleteRequest = async (
     const userIndex = users.findIndex((user) => user.id === userId);
 
     if (userIndex !== -1 && isUuidValid(userId)) {
+      if (cluster.isWorker && process.send) {
+        process.send({ type: 'state', data: users });
+      }
       sendResponse(
         response,
         204,
@@ -198,5 +214,13 @@ export const handleDeleteRequest = async (
     sendResponse(response, 500, CONTENT_TYPE_JSON, {
       error: ErrorType.INTERNAL_SERVER_ERROR,
     });
+  }
+};
+
+export const updateUsers = (newUsers: User[]): void => {
+  try {
+    users = newUsers;
+  } catch (error) {
+    console.log(ErrorType.COMMON_ERROR);
   }
 };

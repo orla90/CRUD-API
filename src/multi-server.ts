@@ -2,9 +2,11 @@ import http, { IncomingMessage, ServerResponse } from "http";
 import cluster from "cluster";
 import os from "os";
 import { requestHandler } from "./utils/request-handlers";
-import { User } from "./common/models/user";
+import { ClusterMessage, User } from "./common/models/user";
+import { ErrorType } from "./common/enum/error-types.enum";
+import { updateUsers } from "./utils/db";
 
-export const createMultiServer = (port: string | number) => {
+export const createMultiServer = (port: string | number) => {  
   try {
     const numberOfCPU = os.availableParallelism();
 
@@ -26,9 +28,9 @@ export const createMultiServer = (port: string | number) => {
         });
       });
 
-      cluster.on("exit", (worker) =>
-        console.log(`worker ${worker.process.pid} died`),
-      );
+      cluster.on("exit", (worker) => {
+        console.log(`worker ${worker.process.pid} died`)
+      });
 
       const server = http.createServer();
       server.on(
@@ -38,14 +40,14 @@ export const createMultiServer = (port: string | number) => {
             originalReq.url || "",
             `http://${originalReq.headers.host}`,
           );
-          const newPort = (+port + lastWorkerIndex + 1).toString();
+          const MULTI_SERVER_PORT = (+port + lastWorkerIndex + 1).toString();
 
           const requestOptions = {
             hostname: "localhost",
-            port: newPort,
+            port: MULTI_SERVER_PORT,
             path: pathname,
             method: originalReq.method,
-            headers: { ...originalReq.headers, host: `localhost:${newPort}` },
+            headers: { ...originalReq.headers, host: `localhost:${MULTI_SERVER_PORT}` },
           };
 
           const proxyRequest = http.request(requestOptions, (proxyResponse) => {
@@ -54,6 +56,7 @@ export const createMultiServer = (port: string | number) => {
               proxyResponse.headers,
             );
             proxyResponse.pipe(originalRes, { end: true });
+            console.log(`Request sent to port ${ MULTI_SERVER_PORT }`);
           });
 
           originalReq.pipe(proxyRequest, { end: true });
@@ -68,10 +71,14 @@ export const createMultiServer = (port: string | number) => {
       );
 
       server.listen(port, () =>
-        console.log(`Primary server listening on port ${port}`),
+        console.log(`Primary server listening on port ${ port }`),
       );
     } else {
       console.log(`Worker ${process.pid} started`);
+
+      process.on('message', (message: ClusterMessage) => {
+        updateUsers(message.data);
+      });
 
       const server = http.createServer(requestHandler);
       const workerPort = +port + cluster.worker!.id!;
@@ -81,6 +88,6 @@ export const createMultiServer = (port: string | number) => {
       );
     }
   } catch {
-    console.log("Error");
+    console.log(ErrorType.COMMON_ERROR);
   }
 };
