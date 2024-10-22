@@ -1,0 +1,40 @@
+{
+  "name": "crud-api",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start:dev": "nodemon --exec ts-node src/index.ts",
+    "start:prod": "npm run build && npm run start:build",
+    "start:multi": "nodemon --exec ts-node src/index.ts --multi",
+    "build": "tsc",
+    "start:build": "node dist/index.js",
+    "test": "jest --runInBand --forceExit",
+    "lint": "eslint src --fix",
+    "prettier": "prettier --write src/**/*.ts"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/jest": "^29.5.13",
+    "@types/node": "^22.7.6",
+    "@types/supertest": "^6.0.2",
+    "@types/uuid": "^10.0.0",
+    "@typescript-eslint/eslint-plugin": "^8.9.0",
+    "@typescript-eslint/parser": "^8.9.0",
+    "eslint": "^9.12.0",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-plugin-prettier": "^5.2.1",
+    "jest": "^29.7.0",
+    "nodemon": "^3.1.7",
+    "prettier": "^3.3.3",
+    "supertest": "^7.0.0",
+    "ts-jest": "^29.2.5",
+    "ts-node": "^10.9.2"
+  },
+  "dependencies": {
+    "dotenv": "^16.4.5",
+    "uuid": "^10.0.0"
+  }
+}
