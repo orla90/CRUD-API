@@ -37,7 +37,12 @@ This application demonstrates simple CRUD API implemented using Node.js.
     ```bash
     npm install
 
-5. **Use one of Running Modes commands**
+5. **Create .env (not necessary)**
+    Create your own .env file specifying the port to use
+    ```bash
+    PORT=4000
+
+6. **Use one of Running Modes commands**
 - Use Node.js version 22.x.x (22.9.0 or higher). To run the application use one of the running modes commands.
 
 ### Running Modes
